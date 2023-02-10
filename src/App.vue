@@ -1,18 +1,27 @@
-<template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+<template lang="pug">
+  UserTableComponent(
+    :users="users"
+    @remove="removeUserById"
+  )
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-import HelloWorld from './components/HelloWorld.vue';
+<script lang="ts" setup>
+import { store } from "@/store";
+import UserTableComponent from "@/components/blocks/UserTableComponent.vue";
+import { ComputedRef, computed, onMounted } from "vue";
+import { UserInterface } from "@/interface/user.interface";
+import UserService from "@/services/user.service";
 
-export default defineComponent({
-  name: 'App',
-  components: {
-    HelloWorld
-  }
+onMounted(async() => {
+  await UserService.getAllUsers();
 });
+
+const users: ComputedRef<UserInterface[]> = computed(() => store.state.users);
+
+const removeUserById = async(id: string): Promise<void> => {
+  await UserService.deleteUserById(id)
+      .then(res => console.log(res));
+};
 </script>
 
 <style lang="stylus">
@@ -22,5 +31,4 @@ export default defineComponent({
   -moz-osx-font-smoothing grayscale
   text-align center
   color #2c3e50
-  margin-top 60px
 </style>
